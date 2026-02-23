@@ -1,50 +1,32 @@
 using SensorX.Domain.SeedWork;
-
 namespace SensorX.Domain.AggregatesModel.OrderAggregate;
 
-public record OrderItem : Entity<OrderItemId>
+public class OrderItem(
+    OrderItemId id,
+    string productName,
+    string productCode,
+    decimal unitPrice,
+    int quantity)
+    : Entity<OrderItemId>(id)
 {
-    public string ProductName { get; private set; }
-    public string ProductCode { get; private set; }
-    public decimal UnitPrice { get; private set; }
-    public int Quantity { get; private set; }
-
-    private OrderItem(
-        string productName,
-        string productCode,
-        decimal unitPrice,
-        int quantity
-    ) : base(new OrderItemId(Guid.CreateVersion7()))
-    {
-        ProductName = productName;
-        ProductCode = productCode;
-        UnitPrice = unitPrice;
-        Quantity = quantity;
-    }
+    public string ProductName { get; private set; } = productName;
+    public string ProductCode { get; private set; } = productCode;
+    public decimal UnitPrice { get; private set; } = unitPrice;
+    public int Quantity { get; private set; } = quantity;
 
     public static OrderItem Create(
         string productName,
         string productCode,
         decimal unitPrice,
-        int quantity
-    )
+        int quantity)
     {
-        if (string.IsNullOrWhiteSpace(productName))
-        {
-            throw new ArgumentException("Product name cannot be null or empty");
-        }
-        if (string.IsNullOrWhiteSpace(productCode))
-        {
-            throw new ArgumentException("Product code cannot be null or empty");
-        }
-        if (unitPrice < 0)
-        {
-            throw new ArgumentException("Unit price cannot be negative");
-        }
-        if (quantity < 0)
-        {
-            throw new ArgumentException("Quantity cannot be negative");
-        }
-        return new OrderItem(productName, productCode, unitPrice, quantity);
+        // Validation logic giữ nguyên
+        ArgumentException.ThrowIfNullOrWhiteSpace(productName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(productCode);
+        if (unitPrice < 0) throw new ArgumentException("Unit price cannot be negative");
+        if (quantity < 0) throw new ArgumentException("Quantity cannot be negative");
+
+        // Gọi Primary Constructor thông qua 'new'
+        return new OrderItem(new OrderItemId(Guid.NewGuid()), productName, productCode, unitPrice, quantity);
     }
 }

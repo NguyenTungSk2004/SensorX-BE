@@ -1,13 +1,13 @@
+using MediatR;
 using SensorX.Domain.Common.Extensions;
 using SensorX.Domain.SeedWork;
-using MediatR;
 
 namespace SensorX.Application.Commands.BaseAuditable.Recovery
 {
     public abstract class GenericRecoveryHandler<TEntity, TCommand>(
         IRepository<TEntity> repository
     ) : IRequestHandler<TCommand, bool>
-        where TEntity : Entity, ISoftDeletable, IAggregateRoot
+        where TEntity : Entity<VoId>, ISoftDeletable, IAggregateRoot
         where TCommand : GenericRecoveryCommand
     {
         public async Task<bool> Handle(TCommand request, CancellationToken cancellationToken)

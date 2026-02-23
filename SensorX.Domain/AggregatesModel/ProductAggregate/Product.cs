@@ -2,7 +2,7 @@ using SensorX.Domain.SeedWork;
 
 namespace SensorX.Domain.AggregatesModel.ProductAggregate;
 
-public class Product(string name, string description, decimal price) : AuditEntity, IAggregateRoot
+public class Product(ProductId id, string name, string description, decimal price) : AuditEntity(id), IAggregateRoot
 {
     public string Name { get; private set; } = name;
     public string Description { get; private set; } = description;

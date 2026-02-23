@@ -1,13 +1,13 @@
+using MediatR;
 using SensorX.Domain.Common.Specifications;
 using SensorX.Domain.SeedWork;
-using MediatR;
 
 namespace SensorX.Application.Commands.BaseAuditable.HardDelete
 {
     public abstract class GenericHardDeleteHandler<TEntity, TCommand>(
         IRepository<TEntity> repository
     ) : IRequestHandler<TCommand, bool>
-        where TEntity : Entity, ISoftDeletable, IAggregateRoot
+        where TEntity : Entity<VoId>, ISoftDeletable, IAggregateRoot
         where TCommand : GenericHardDeleteCommand
     {
         public async Task<bool> Handle(TCommand request, CancellationToken cancellationToken)
@@ -17,9 +17,10 @@ namespace SensorX.Application.Commands.BaseAuditable.HardDelete
                 if (request.UserId != 1)
                     throw new UnauthorizedAccessException("User không có quyền xóa vĩnh viễn bản ghi");
 
-                var spec = new EntitiesByIdsSpecification<TEntity>(request.Ids, true);
+                var ids = request.Ids.Select(id => new VoId(id)).ToList();
+                var spec = new EntitiesByIdsSpecification<TEntity>(ids, true);
                 var entities = await repository.ListAsync(spec, cancellationToken);
-                var toDelete = entities.Where(e => (bool)(e.GetType().GetProperty("IsDeleted")?.GetValue(e) ?? false)).ToList();
+                var toDelete = entities.Where(e => e.IsDeleted).ToList();
 
                 if (toDelete == null || toDelete.Count == 0)
                     throw new ApplicationException("Không tìm thấy bất kỳ bản ghi nào");

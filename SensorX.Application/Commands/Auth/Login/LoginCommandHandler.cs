@@ -1,20 +1,19 @@
+using MediatR;
 using SensorX.Application.Common.Interfaces;
 using SensorX.Domain.AggregatesModel.UserAggregate;
 using SensorX.Domain.AggregatesModel.UserAggregate.Specifications;
 using SensorX.Domain.Common.Utilities;
 using SensorX.Domain.SeedWork;
-using MediatR;
 
 namespace SensorX.Application.Commands.Auth.Login;
 
 public class LoginCommandHandler(IRepository<User> userRepository) : IRequestHandler<LoginCommand, string>
 {
-    private readonly IRepository<User> _userRepository = userRepository;
 
     public async Task<string> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var spec = new UserByUsernameSpec(request.Username);
-        var user = await _userRepository.FirstOrDefaultAsync(spec, cancellationToken);
+        var user = await userRepository.FirstOrDefaultAsync(spec, cancellationToken);
 
         if (user is null || user.PasswordHash != HashHelper.HashToken(request.Password))
         {
